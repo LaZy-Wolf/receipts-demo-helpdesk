@@ -128,7 +128,9 @@ def reopen_ticket(request, pk):
     if ticket.status != "closed":
         return JsonResponse({"detail": "only closed tickets can be reopened"}, status=409)
     ticket.status = "open"
-    ticket.save(update_fields=["status"])
+    ticket.closed_at = None
+    ticket.due_at = sla.due_at(ticket.team, ticket.priority, timezone.now())
+    ticket.save(update_fields=["status", "closed_at", "due_at"])
     return JsonResponse(ticket_json(ticket))
 
 
