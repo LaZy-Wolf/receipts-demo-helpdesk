@@ -2,10 +2,10 @@ from django.db.models import QuerySet
 
 
 def apply_filters(qs: QuerySet, params, agent) -> QuerySet | list:
-    status = params.get("status")
-    if status and status != "all":
-        qs = qs.filter(status=status.split(",")[0])
-    elif not status:
+    statuses = [s.strip() for s in (params.get("status") or "").split(",") if s.strip()]
+    if statuses:
+        qs = qs.filter(status__in=statuses)
+    else:
         qs = qs.exclude(status="closed")
 
     if params.get("priority"):
