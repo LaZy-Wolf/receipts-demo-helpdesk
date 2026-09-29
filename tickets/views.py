@@ -11,6 +11,8 @@ from . import sla
 from .assignment import next_agent
 from .filters import apply_filters
 from .models import Agent, Comment, Ticket
+from .serializers import iso as _iso
+from .serializers import ticket_json
 
 
 def api(*methods):
@@ -36,31 +38,6 @@ def api(*methods):
             return view(request, *args, **kwargs)
         return wrapper
     return decorator
-
-
-def _iso(dt):
-    return dt.isoformat() if dt else None
-
-
-def ticket_json(ticket: Ticket, with_comments: bool = False) -> dict:
-    data = {
-        "id": ticket.pk,
-        "subject": ticket.subject,
-        "requester_email": ticket.requester_email,
-        "priority": ticket.priority,
-        "status": ticket.status,
-        "assignee": ticket.assignee.user.username if ticket.assignee else None,
-        "created_at": _iso(ticket.created_at),
-        "due_at": _iso(ticket.due_at),
-        "closed_at": _iso(ticket.closed_at),
-    }
-    if with_comments:
-        data["body"] = ticket.body
-        data["comments"] = [
-            {"author": c.author.username, "body": c.body, "internal": c.internal, "created_at": _iso(c.created_at)}
-            for c in ticket.comments.select_related("author")
-        ]
-    return data
 
 
 def team_tickets(request):
