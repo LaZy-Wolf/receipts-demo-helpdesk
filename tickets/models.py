@@ -44,7 +44,7 @@ class Ticket(models.Model):
         return self.status in ("open", "pending")
 
     def is_overdue(self, now: datetime | None = None) -> bool:
-        now = now or datetime.now()
+        now = now or timezone.now()
         return self.is_open() and self.due_at is not None and self.due_at < now
 
     def __str__(self):
