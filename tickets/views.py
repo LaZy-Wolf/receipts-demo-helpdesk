@@ -134,7 +134,8 @@ def reopen_ticket(request, pk):
 
 @api("GET")
 def export_csv(request):
-    found = apply_filters(Ticket.objects.select_related("assignee__user"), request.GET, request.agent)
+    own = Ticket.objects.filter(assignee__user=request.user).select_related("assignee__user")
+    found = apply_filters(own, request.GET, request.agent)
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="tickets.csv"'
     writer = csv.writer(response)
