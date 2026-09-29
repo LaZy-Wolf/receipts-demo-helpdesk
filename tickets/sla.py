@@ -16,10 +16,6 @@ def _next_business_day(dt: datetime, day_start: time) -> datetime:
     return dt
 
 
-def _next_day_start(dt: datetime, day_start: time) -> datetime:
-    return _at(dt + timedelta(days=1), day_start)
-
-
 def into_business_hours(dt: datetime, day_start: time, day_end: time) -> datetime:
     """Move `dt` forward to the next moment inside business hours (or leave it if already inside)."""
     if dt.weekday() >= 5 or dt.time() >= day_end:
@@ -41,7 +37,7 @@ def add_business_hours(start: datetime, hours: float, day_start: time = time(9),
         if remaining <= available:
             return current + remaining
         remaining -= available
-        current = _next_day_start(current, day_start)
+        current = _next_business_day(current, day_start)
 
 
 def due_at(team, priority: str, start: datetime) -> datetime:
